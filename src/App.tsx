@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { compare, example, limits, initialCopies, type Parameters } from './motor';
 import { formatFrequency, populationName, Trajectory } from './Trajectory';
 
+import { Experiments } from './Experiments';
+
 export function App() {
   const [parameters, setParameters] = useState(example);
   const [formVersion, setFormVersion] = useState(0);
@@ -102,11 +104,13 @@ export function App() {
           </div>
         </section>
       </div>
+      <Experiments key={formVersion + JSON.stringify(parameters)} parameters={parameters} />
       <section className="model">
         <h2>Cómo funciona el modelo</h2>
-        <p>Cada población diploide tiene N individuos y 2N copias del gen. En cada generación se sortean 2N copias con reemplazo según la frecuencia anterior. El tamaño se mantiene constante y ambos alelos tienen la misma probabilidad de transmitirse por copia. El modelo excluye selección, mutación y migración.</p>
+        <p>Cada población diploide tiene N individuos y 2N copias del gen. En cada generación se sortean 2N copias con reemplazo según la frecuencia anterior. El tamaño se mantiene constante y cada copia del gen tiene la misma probabilidad de ser elegida. El modelo excluye selección, mutación y migración.</p>
         <p>Una corrida individual puede mostrar un resultado distinto del patrón observado al repetir el experimento.</p>
       </section>
     </main>
   </>;
 }
+
