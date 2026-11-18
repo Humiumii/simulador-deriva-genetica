@@ -85,7 +85,7 @@ export function PopulationLab({ size, frequency, generation, seed, population, f
     data-generation={generation} data-copies-a={copiesA} data-copies-b={copies - copiesA}>
     <div className="chamber-header">
       <div><h3 id={`chamber-${population}`}>{label}</h3><span>{size} individuos</span></div>
-      <span className="generation-label">Generación <strong>{generation}</strong></span>
+      {individuals.length < size && <span>{individuals.length} de {size} visibles</span>}
     </div>
     <div className="chamber-viewport">
       {flat || failed ? fallback : <SceneBoundary fallback={fallback}>
@@ -95,7 +95,7 @@ export function PopulationLab({ size, frequency, generation, seed, population, f
             onFailure={() => setFailed(true)} fallback={fallback} />
         </Suspense>
       </SceneBoundary>}
-      {individuals.length < size && <span className="sample-label">{individuals.length} de {size} visibles</span>}
+
       {failed && !flat && <span className="fallback-label">Vista 2D · 3D no disponible</span>}
       {absorbed && <div className="absorption-notice" role="status">
         <AlleleIcon allele={fixedAllele} />
@@ -113,7 +113,7 @@ export function PopulationLab({ size, frequency, generation, seed, population, f
       })}
     </dl>
     <div className="individual-detail">
-      <label>Monito<select aria-label={`Seleccionar monito de ${label}`} value={selected}
+      <label>Seleccionar monito<select aria-label={`Seleccionar monito de ${label}`} value={selected}
         onChange={event => setSelection(Number(event.target.value))}>
         {individuals.map((_, i) => <option key={i} value={i}>{i + 1}</option>)}
       </select></label>
@@ -126,5 +126,5 @@ export function PopulationLab({ size, frequency, generation, seed, population, f
 export function AlleleLegend() {
   return <p className="lab-legend"><span><AlleleIcon allele="A" /> A · punta redonda</span>
     <span><AlleleIcon allele="B" /> B · punta de rombo</span>
-    <span>Cada monito representa un individuo diploide. El emparejamiento de sus dos copias es ilustrativo.</span></p>;
+    <span>Cada antena representa una copia. El emparejamiento por individuo es ilustrativo.</span></p>;
 }

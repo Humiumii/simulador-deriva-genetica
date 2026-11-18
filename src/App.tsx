@@ -50,37 +50,20 @@ export function App() {
   }
 
   return <>
-    <header className="masthead"><div className="shell"><span className="brand-icon" aria-hidden="true">∿</span> Laboratorio de poblaciones</div></header>
     <main className="shell">
-      <section className="intro">
+      <header className="exhibit-header">
         <div>
           <h1>Deriva genética</h1>
-          <p>Dos poblaciones parten de la misma frecuencia. Explora cuánto puede cambiar el azar el destino de un alelo.</p>
+          <p>Observa cómo cambia una población cuando el azar decide qué alelos pasan a la siguiente generación.</p>
         </div>
-        <label className="hypothesis" htmlFor="hypothesis">
-          <strong>Tu hipótesis</strong>
-          <textarea id="hypothesis" rows={2} value={hypothesis} onChange={event => setHypothesis(event.target.value)}
-            placeholder="¿En cuál población esperas más dispersión?" />
-        </label>
-      </section>
-      <section className="lab" aria-labelledby="lab-heading">
-        <div className="lab-header">
-          <div><h2 id="lab-heading">Cámaras de población</h2><p>Selecciona un monito para mirar sus antenas.</p></div>
-          {webgl
-            ? <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
-            : <span className="mode-notice">Vista 2D · WebGL no disponible</span>}
-        </div>
-        <TimeControls generation={generation} total={parameters.generations} playing={playing}
-          toggle={() => setPlaying(!playing)} seek={seek} reset={reset} />
-        <div className="chambers">
-          {paths.map((path, population) => <PopulationLab key={population} population={population}
-            size={parameters.sizes[population]} generation={generation} frequency={path[generation]} seed={parameters.seed} flat={flat || !webgl} reducedMotion={reducedMotion}
-            endpoint={path.findIndex(value => value === 0 || value === 1)} />)}
-        </div>
-        <AlleleLegend />
-      </section>
-      <div className="workspace">
-        <aside className="panel setup">
+        <nav className="exhibit-nav" aria-label="Secciones del experimento">
+          <a href="#trayectorias">Trayectorias</a>
+          <a href="#replicas">Réplicas</a>
+        </nav>
+      </header>
+      <details className="parameters">
+        <summary>Parámetros del experimento</summary>
+        <div className="setup">
           <div className="setup-heading"><h2>Configuración</h2><button className="text-button" onClick={() => {
             setParameters(example);
             setFormVersion(formVersion + 1);
@@ -99,6 +82,10 @@ export function App() {
               <label>Generaciones<input name="generations" type="number" min="1" max={limits.generations} defaultValue={parameters.generations} required /></label>
               <label>Semilla<input name="seed" type="number" min="0" max={limits.seed} defaultValue={parameters.seed} required /></label>
             </div>
+              <label className="hypothesis">Tu hipótesis
+                <textarea rows={2} value={hypothesis} onChange={event => setHypothesis(event.target.value)}
+                  placeholder="¿En cuál población esperas más dispersión?" />
+              </label>
             <button className="primary" type="submit">Aplicar parámetros</button>
           </form>
           <div className="initial">
@@ -108,8 +95,24 @@ export function App() {
               return <div key={index}><span>{populationName(index)}</span><span>{copies}/{2 * size} · {formatFrequency(copies / (2 * size))}</span></div>;
             })}
           </div>
-        </aside>
-        <section className="panel chart" aria-labelledby="chart-heading">
+        </div>
+      </details>
+      <section className="lab" aria-label="Cámaras de población">
+        <TimeControls generation={generation} total={parameters.generations} playing={playing}
+          toggle={() => setPlaying(!playing)} seek={seek} reset={reset} />
+        <div className="chambers">
+          {paths.map((path, population) => <PopulationLab key={population} population={population}
+            size={parameters.sizes[population]} generation={generation} frequency={path[generation]} seed={parameters.seed} flat={flat || !webgl} reducedMotion={reducedMotion}
+            endpoint={path.findIndex(value => value === 0 || value === 1)} />)}
+        </div>
+        <div className="lab-footer">
+          <AlleleLegend />
+          {webgl
+            ? <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
+            : <span className="mode-notice">Vista 2D · WebGL no disponible</span>}
+        </div>
+      </section>
+        <section id="trayectorias" className="panel chart" aria-labelledby="chart-heading">
           <div className="chart-heading"><div><h2 id="chart-heading">Trayectorias</h2><p>Frecuencia del alelo A</p></div>
             <output className="counter" aria-live="off">Generación <strong>{generation} / {parameters.generations}</strong></output></div>
           <div className="readouts">
@@ -124,7 +127,6 @@ export function App() {
           </div>
           <Trajectory paths={paths} generation={generation} total={parameters.generations} />
         </section>
-      </div>
       <Experiments key={formVersion + JSON.stringify(parameters)} parameters={parameters} />
       <section className="model">
         <h2>Cómo funciona el modelo</h2>
