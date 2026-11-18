@@ -28,6 +28,15 @@ export function App() {
     return () => window.clearTimeout(timer);
   }, [finished, generation, parameters, playing]);
 
+  function togglePlayback() {
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+    if (finished) setGeneration(0);
+    setPlaying(true);
+  }
+
   function seek(next: number) {
     setPlaying(false);
     setGeneration(next);
@@ -61,45 +70,50 @@ export function App() {
           <a href="#replicas">Réplicas</a>
         </nav>
       </header>
-      <details className="parameters">
-        <summary>Parámetros del experimento</summary>
-        <div className="setup">
-          <div className="setup-heading"><h2>Configuración</h2><button className="text-button" onClick={() => {
-            setParameters(example);
-            setFormVersion(formVersion + 1);
-            reset();
-          }}>Cargar ejemplo</button></div>
-          <form key={formVersion} onSubmit={configure}>
-            <fieldset>
-              <legend>Tamaño de las poblaciones</legend>
+      <div className="exhibit-options">
+        <details className="parameters">
+          <summary>Parámetros del experimento</summary>
+          <div className="setup">
+            <div className="setup-heading"><h2>Configuración</h2><button className="text-button" onClick={() => {
+              setParameters(example);
+              setFormVersion(formVersion + 1);
+              reset();
+            }}>Cargar ejemplo</button></div>
+            <form key={formVersion} onSubmit={configure}>
+              <fieldset>
+                <legend>Tamaño de las poblaciones</legend>
+                <div className="fields">
+                  <label className="series-a">Población A<input name="sizeA" type="number" min="1" max={limits.size} defaultValue={parameters.sizes[0]} required /></label>
+                  <label className="series-b">Población B<input name="sizeB" type="number" min="1" max={limits.size} defaultValue={parameters.sizes[1]} required /></label>
+                </div>
+              </fieldset>
+              <label>Frecuencia inicial del alelo A (%)<input name="frequency" type="number" min="0" max="100" step="any" defaultValue={parameters.initial * 100} required /></label>
               <div className="fields">
-                <label className="series-a">Población A<input name="sizeA" type="number" min="1" max={limits.size} defaultValue={parameters.sizes[0]} required /></label>
-                <label className="series-b">Población B<input name="sizeB" type="number" min="1" max={limits.size} defaultValue={parameters.sizes[1]} required /></label>
+                <label>Generaciones<input name="generations" type="number" min="1" max={limits.generations} defaultValue={parameters.generations} required /></label>
+                <label>Semilla<input name="seed" type="number" min="0" max={limits.seed} defaultValue={parameters.seed} required /></label>
               </div>
-            </fieldset>
-            <label>Frecuencia inicial del alelo A (%)<input name="frequency" type="number" min="0" max="100" step="any" defaultValue={parameters.initial * 100} required /></label>
-            <div className="fields">
-              <label>Generaciones<input name="generations" type="number" min="1" max={limits.generations} defaultValue={parameters.generations} required /></label>
-              <label>Semilla<input name="seed" type="number" min="0" max={limits.seed} defaultValue={parameters.seed} required /></label>
+                <label className="hypothesis">Tu hipótesis
+                  <textarea rows={2} value={hypothesis} onChange={event => setHypothesis(event.target.value)}
+                    placeholder="¿En cuál población esperas más dispersión?" />
+                </label>
+              <button className="primary" type="submit">Aplicar parámetros</button>
+            </form>
+            <div className="initial">
+              <strong>Frecuencia inicial efectiva</strong>
+              {parameters.sizes.map((size, index) => {
+                const copies = initialCopies(size, parameters.initial);
+                return <div key={index}><span>{populationName(index)}</span><span>{copies}/{2 * size} · {formatFrequency(copies / (2 * size))}</span></div>;
+              })}
             </div>
-              <label className="hypothesis">Tu hipótesis
-                <textarea rows={2} value={hypothesis} onChange={event => setHypothesis(event.target.value)}
-                  placeholder="¿En cuál población esperas más dispersión?" />
-              </label>
-            <button className="primary" type="submit">Aplicar parámetros</button>
-          </form>
-          <div className="initial">
-            <strong>Frecuencia inicial efectiva</strong>
-            {parameters.sizes.map((size, index) => {
-              const copies = initialCopies(size, parameters.initial);
-              return <div key={index}><span>{populationName(index)}</span><span>{copies}/{2 * size} · {formatFrequency(copies / (2 * size))}</span></div>;
-            })}
           </div>
-        </div>
-      </details>
+        </details>
+          {webgl
+            ? <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
+            : <span className="mode-notice">Vista 2D · WebGL no disponible</span>}
+      </div>
       <section className="lab" aria-label="Cámaras de población">
         <TimeControls generation={generation} total={parameters.generations} playing={playing}
-          toggle={() => setPlaying(!playing)} seek={seek} reset={reset} />
+          toggle={togglePlayback} seek={seek} reset={reset} />
         <div className="chambers">
           {paths.map((path, population) => <PopulationLab key={population} population={population}
             size={parameters.sizes[population]} generation={generation} frequency={path[generation]} seed={parameters.seed} flat={flat || !webgl} reducedMotion={reducedMotion}
@@ -107,26 +121,23 @@ export function App() {
         </div>
         <div className="lab-footer">
           <AlleleLegend />
-          {webgl
-            ? <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
-            : <span className="mode-notice">Vista 2D · WebGL no disponible</span>}
         </div>
       </section>
-        <section id="trayectorias" className="panel chart" aria-labelledby="chart-heading">
-          <div className="chart-heading"><div><h2 id="chart-heading">Trayectorias</h2><p>Frecuencia del alelo A</p></div>
-            <output className="counter" aria-live="off">Generación <strong>{generation} / {parameters.generations}</strong></output></div>
-          <div className="readouts">
-            {paths.map((path, index) => {
-              const endpoint = path.findIndex(value => value === 0 || value === 1);
-              return <div key={index} className={index === 0 ? 'series-a' : 'series-b'}>
-                <span className="series-label">{populationName(index)} · N = {parameters.sizes[index]}</span>
-                <strong>{formatFrequency(path[generation])}</strong>
-                {endpoint >= 0 && endpoint <= generation && <small>{path[endpoint] === 0 ? 'Pérdida' : 'Fijación'} · gen. {endpoint}</small>}
-              </div>;
-            })}
-          </div>
-          <Trajectory paths={paths} generation={generation} total={parameters.generations} />
-        </section>
+      <section id="trayectorias" className="panel chart" aria-labelledby="chart-heading">
+        <div className="chart-heading"><div><h2 id="chart-heading">Trayectorias</h2><p>Frecuencia del alelo A</p></div>
+          <output className="counter" aria-live="off">Generación <strong>{generation} / {parameters.generations}</strong></output></div>
+        <div className="readouts">
+          {paths.map((path, index) => {
+            const endpoint = path.findIndex(value => value === 0 || value === 1);
+            return <div key={index} className={index === 0 ? 'series-a' : 'series-b'}>
+              <span className="series-label">{populationName(index)} · N = {parameters.sizes[index]}</span>
+              <strong>{formatFrequency(path[generation])}</strong>
+              {endpoint >= 0 && endpoint <= generation && <small>{path[endpoint] === 0 ? 'Pérdida' : 'Fijación'} · gen. {endpoint}</small>}
+            </div>;
+          })}
+        </div>
+        <Trajectory paths={paths} generation={generation} total={parameters.generations} />
+      </section>
       <Experiments key={formVersion + JSON.stringify(parameters)} parameters={parameters} />
       <section className="model">
         <h2>Cómo funciona el modelo</h2>

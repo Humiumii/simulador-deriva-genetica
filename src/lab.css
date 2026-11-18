@@ -1,21 +1,24 @@
 :root {
-  --glass: #303632;
   --glass-text: #f6f5ec;
-  --glass-muted: #d4d8cf;
   --allele-a: #49e9b9;
   --allele-b: #ff8da8;
 }
 .time-controls { display: flex; align-items: center; gap: 10px 22px; background: var(--paper); padding: 8px 0 10px; border-top: 1px solid var(--line); }
 .time-buttons { display: flex; align-items: center; flex-shrink: 0; gap: 6px; }
-.time-buttons button { min-height: 40px; }
+.time-buttons button { min-height: 44px; }
 .time-buttons .play-button { min-width: 111px; color: #fffefa; background: #313831; border-color: #313831; }
 .time-buttons .play-button:hover:not(:disabled) { background: #4d574c; }
-.time-buttons .time-step { min-width: 40px; font-variant-numeric: tabular-nums; }
+.time-buttons .time-step { min-width: 44px; font-variant-numeric: tabular-nums; }
 .time-reset { border-color: transparent; }
 .scrubber { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr auto; column-gap: 8px; align-items: center; }
 .scrubber label,.scrubber output { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
-.scrubber output strong { color: var(--ink); font-size: 1.14rem; }
-.scrubber input { grid-column: 1 / -1; accent-color: #363e35; margin: 0; padding: 0; min-height: 22px; cursor: pointer; }
+.scrubber output strong { color: var(--ink); font-size: 1.28rem; line-height: 1; }
+.scrubber input { grid-column: 1 / -1; appearance: none; border: 0; background: transparent; margin: 0; padding: 0; height: 28px; cursor: pointer; }
+.scrubber input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, #343c34 var(--progress), #7c8176 var(--progress)); }
+.scrubber input::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: #343c34; border: 2px solid var(--paper); box-shadow: 0 0 0 1px #343c34; }
+.scrubber input::-moz-range-track { height: 4px; border-radius: 2px; background: #7c8176; }
+.scrubber input::-moz-range-progress { height: 4px; background: #343c34; }
+.scrubber input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #343c34; border: 2px solid var(--paper); box-shadow: 0 0 0 1px #343c34; }
 .chambers { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: clamp(12px,2.1vw,28px); }
 .chamber { min-width: 0; border-top: 2px solid #535c51; }
 .chamber-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; padding: 8px 0 9px; }
@@ -45,9 +48,15 @@
 .mode-toggle[aria-pressed="true"] { background: #dce0d4; }
 .mode-notice { font-size: .82rem; color: var(--muted); }
 .absorption-notice,.fallback-label { position: absolute; z-index: 1; pointer-events: none; padding: 6px 8px; font-size: .8rem; background: #272d29; color: var(--glass-text); }
-.absorption-notice { inset: 9px auto auto 9px; border-left: 3px solid #d4d8cc; }
+.absorption-notice { inset: 9px auto auto 9px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 5px; border-left: 3px solid #d4d8cc; }
+.absorption-notice span:last-child { margin-left: 3px; }
+.chamber[data-fixed] { border-top-color: #282f28; }
+.chamber[data-fixed] .chamber-viewport::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 2px #d4d8cc; }
+.chamber[data-fixed] .allele-counts { background: #e3e6db; }
+.chamber[data-fixed] .allele-counts div:first-child { padding-left: 8px; }
 .fallback-label { inset: auto auto 8px 8px; }
 .flat-creatures { height: 100%; display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); grid-auto-rows: minmax(0,1fr); gap: 3px; padding: 24px 10px 13px; max-width: 410px; margin-inline: auto; }
+.chamber[data-fixed] .flat-creatures { padding-top: 45px; }
 .flat-sparse { grid-template-columns: repeat(5,minmax(0,1fr)); max-width: 340px; }
 .flat-creature,.flat-creature:hover:not(:disabled) { display: grid; place-items: center; align-self: center; position: relative; background: transparent; border: 1px solid transparent; padding: 0; min-width: 0; min-height: 0; height: 100%; max-height: 50px; }
 .flat-sparse .flat-creature { max-height: 66px; }
@@ -66,6 +75,7 @@
   .time-buttons { justify-content: space-between; gap: 5px; }
   .chambers { grid-template-columns: minmax(0,1fr); margin-top: 10px; }
   .chamber-viewport { height: clamp(228px,64vw,410px); }
+  .individual-detail select,.flat-creature { scroll-margin-top: 110px; }
 }
 @media (max-width: 355px) {
   .time-buttons .play-button { min-width: 0; }

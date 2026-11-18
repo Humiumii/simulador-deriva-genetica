@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Component, lazy, Suspense, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { displayLimit, pairIndividuals, type Allele, type Individual } from './individuals';
 import { exchangeDuration } from './labMotion';
 import { populationName } from './Trajectory';
@@ -42,19 +42,34 @@ function FlatCreatures({ individuals, selected, onSelect, generation, reducedMot
   useLayoutEffect(() => {
     const previous = lastGeneration.current;
     lastGeneration.current = generation;
-    if (reducedMotion || previous === generation) return;
-    const offset = generation > previous ? -9 : 9;
+    if (reducedMotion || Math.abs(generation - previous) !== 1) return;
+    const offset = generation > previous ? -12 : 12;
     const animation = grid.current?.animate([
-      { opacity: 0.65, transform: 'translate(' + offset + 'px, 5px) scale(.96)' },
-      { opacity: 1, transform: 'translate(0, -2px) scale(1.012)', offset: 0.68 },
+      { opacity: 0.8, transform: 'translate(' + offset + 'px, 4px) scale(.96)' },
+      { opacity: 1, transform: 'translate(0, -2px) scale(1.008)', offset: 0.72 },
       { opacity: 1, transform: 'none' },
     ], { duration: exchangeDuration, easing: 'ease-out' });
     return () => animation?.cancel();
   }, [generation, reducedMotion]);
 
-  return <div ref={grid} className={`flat-creatures ${individuals.length <= 24 ? 'flat-sparse' : ''}`} role="group" aria-label="Monitos en 2D">
+  function moveSelection(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    const columns = individuals.length <= 24 ? 5 : 8;
+    const targets: Record<string, number> = {
+      ArrowLeft: index - 1, ArrowRight: index + 1, ArrowUp: index - columns, ArrowDown: index + columns,
+      Home: 0, End: individuals.length - 1,
+    };
+    const target = targets[event.key];
+    if (typeof target !== 'number') return;
+    event.preventDefault();
+    const next = Math.max(0, Math.min(individuals.length - 1, target));
+    onSelect(next);
+    grid.current?.querySelectorAll('button')[next]?.focus();
+  }
+
+  return <div ref={grid} className={`flat-creatures ${individuals.length <= 24 ? 'flat-sparse' : ''}`} role="group" aria-label="Monitos en 2D, selecciona con las flechas">
     {individuals.map((pair, index) => <button type="button" className="flat-creature" key={index}
-      aria-label={`Monito ${index + 1}: alelos ${pair.join(' y ')}`} aria-pressed={index === selected} onClick={() => onSelect(index)}>
+      aria-label={`Monito ${index + 1}: alelos ${pair.join(' y ')}`} aria-pressed={index === selected}
+      tabIndex={index === selected ? 0 : -1} onKeyDown={event => moveSelection(event, index)} onClick={() => onSelect(index)}>
       <span className="flat-antennas" aria-hidden="true">{pair.map((allele, side) =>
         <i className={`flat-stem allele-${allele}`} key={side}><AlleleIcon allele={allele} /></i>)}</span>
       <span className="flat-body" aria-hidden="true"><i /><i /><b /></span>
@@ -91,17 +106,19 @@ export function PopulationLab({ size, frequency, generation, seed, population, f
       {flat || failed ? fallback : <SceneBoundary fallback={fallback}>
         <Suspense fallback={fallback}>
           <CreatureScene individuals={individuals} selected={selected} onSelect={setSelection}
-            population={population} generation={generation} reducedMotion={reducedMotion}
+            generation={generation} reducedMotion={reducedMotion}
             onFailure={() => setFailed(true)} fallback={fallback} />
         </Suspense>
       </SceneBoundary>}
 
       {failed && !flat && <span className="fallback-label">Vista 2D · 3D no disponible</span>}
-      {absorbed && <div className="absorption-notice" role="status">
-        <AlleleIcon allele={fixedAllele} />
-        <strong>Fijación de {fixedAllele}</strong>
-        <span> · {fixedAllele === 'A' ? 'B' : 'A'} se perdió en gen. {endpoint}</span>
-      </div>}
+      <div role="status" className="absorption-status">
+        {absorbed && <div className="absorption-notice">
+          <AlleleIcon allele={fixedAllele} />
+          <strong>Fijación de {fixedAllele}</strong>
+          <span>{fixedAllele === 'A' ? 'B' : 'A'} se perdió en gen. {endpoint}</span>
+        </div>}
+      </div>
     </div>
     <dl className="allele-counts">
       {(['A', 'B'] as const).map((allele, index) => {
