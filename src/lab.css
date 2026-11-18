@@ -1,0 +1,70 @@
+:root {
+  --lab: #14192e;
+  --chamber: #202740;
+  --lab-text: #f4f5ff;
+  --lab-subtle: #bec9e1;
+  --lab-line: #485270;
+  --allele-a: #49e9b9;
+  --allele-b: #ff8da8;
+}
+.masthead { background: #171e33; color: #f4f5ff; border-color: #383f58; }
+.brand-icon { background: #b2a6ff; color: #1d2143; }
+.intro { margin-block: 29px 22px; }
+h1 { font-size: clamp(3rem, 5.3vw, 4.8rem); }
+.lab { background: var(--lab); color: var(--lab-text); border-radius: 18px; padding: clamp(14px, 2vw, 24px); margin-bottom: 18px; }
+.lab-header { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 14px; }
+.lab-header h2 { font-size: 1.35rem; }
+.lab p { color: var(--lab-subtle); }
+.lab-header p { font-size: .86rem; margin-top: 3px; }
+.mode-toggle { color: var(--lab-text); background: var(--chamber); border-color: var(--lab-line); }
+.mode-toggle:hover { background: #353e5e; }
+.chambers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.chamber { min-width: 0; border: 1px solid var(--lab-line); background: var(--chamber); border-radius: 12px; overflow: hidden; }
+.chamber-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding: 10px 14px; }
+.chamber-header h3 { font-size: 1rem; margin: 0 0 2px; }
+.chamber-header span { color: var(--lab-subtle); font-size: .79rem; }
+.generation-label { background: #14192e; padding: 6px 10px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+.generation-label strong { color: var(--lab-text); }
+.chamber-viewport { position: relative; height: clamp(190px, 21.2vw, 310px); isolation: isolate; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 47%, #2f4f72 0%, #141c35 74%); }
+.chamber-1 .chamber-viewport { background: radial-gradient(ellipse at 50% 47%, #493c73 0%, #191a32 74%); }
+.chamber-viewport canvas { cursor: pointer; }
+.sample-label { position: absolute; inset: auto 8px 7px auto; border: 1px solid #7883ac; border-radius: 5px;
+  color: var(--lab-text); background: #181c32; padding: 3px 7px; font-size: .72rem; pointer-events: none; }
+.allele-counts { display: grid; grid-template-columns: 1fr 1fr; margin: 0; border-block: 1px solid var(--lab-line); }
+.allele-counts div { padding: 9px 13px; min-width: 0; }
+.allele-counts div + div { border-left: 1px solid var(--lab-line); }
+.allele-counts dt { font-size: .76rem; color: var(--lab-subtle); }
+.allele-counts dd { margin: 3px 0 0; display: flex; align-items: baseline; gap: 2px 9px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.allele-counts dd strong { font-size: 1.08rem; }
+.allele-counts dd span { font-size: .76rem; color: var(--lab-subtle); }
+.allele-icon { display: inline-block; width: .68em; height: .68em; margin-inline: .1em .2em; background: var(--allele); vertical-align: .04em; }
+.allele-A { --allele: var(--allele-a); }
+.allele-B { --allele: var(--allele-b); }
+.allele-icon.allele-A { border-radius: 50%; }
+.allele-icon.allele-B { transform: rotate(45deg) scale(.85); border-radius: 1px; }
+.individual-detail { min-height: 43px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 12px; }
+.individual-detail label,.individual-detail output { display: flex; align-items: center; gap: 8px; color: var(--lab-subtle); font-size: .82rem; }
+.individual-detail output strong { color: var(--lab-text); white-space: nowrap; }
+.individual-detail select { background: var(--lab); color: var(--lab-text); border: 1px solid var(--lab-line); border-radius: 5px; padding: 2px 5px; font: inherit; }
+.lab-legend { display: flex; flex-wrap: wrap; gap: 3px 18px; margin-top: 11px; font-size: .79rem; }
+.flat-creatures { height: 100%; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); align-content: center;
+  gap: clamp(1px, .38vw, 5px); padding: 7px 10px 24px; max-width: 390px; margin-inline: auto; }
+.flat-sparse { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 310px; }
+.flat-creature,.flat-creature:hover { display: grid; place-items: center; position: relative; background: transparent;
+  border: 1px solid transparent; padding: 0; min-width: 0; border-radius: 8px; height: clamp(24px, 3vw, 39px); }
+.flat-sparse .flat-creature { height: clamp(32px, 4vw, 52px); }
+.flat-creature[aria-pressed="true"] { border-color: #d8e9ff; background: #d8e9ff2b; }
+.flat-body { position: relative; height: 59%; aspect-ratio: 1.08; align-self: end; margin-bottom: 1px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 25%, #c9ceff, #9da4f6 57%, #6a71bf); box-shadow: 0 2px 3px #15162b9c; }
+.flat-body i { position: absolute; left: 20%; top: 28%; width: 25%; height: 33%; background: radial-gradient(circle at 40% 35%, white 0 15%, #242842 16% 47%, #fff 49%); border-radius: 50%; }
+.flat-body i + i { left: auto; right: 20%; }
+.flat-body b { position: absolute; width: 12%; height: 8%; border-radius: 50%; background: #282d4a; left: 44%; top: 66%; }
+.flat-antennas { position: absolute; bottom: 56%; left: 30%; right: 30%; height: 26%; display: flex; justify-content: space-evenly; }
+.flat-stem { position: relative; width: 2px; background: var(--allele); transform-origin: bottom; transform: rotate(-16deg); }
+.flat-stem + .flat-stem { transform: rotate(16deg); }
+.flat-stem .allele-icon { position: absolute; margin: 0; top: 0; left: 50%; translate: -50% -45%; width: 6px; height: 6px; }
+@media (max-width: 710px) {
+  .chambers { grid-template-columns: minmax(0, 1fr); }
+  .chamber-viewport { height: clamp(188px, 54vw, 280px); }
+}
