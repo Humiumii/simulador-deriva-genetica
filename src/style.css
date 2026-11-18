@@ -72,3 +72,20 @@ button:disabled { opacity: .5; cursor: default; }
   .chart-heading { flex-wrap: wrap; }
   .trajectory text { font-size: 19px; }
 }
+.experiments { margin-top: 18px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.run-status:not(:empty) { color: var(--muted); margin-top: 14px; font-size: .84rem; }
+.replica-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.replica-grid > div { background: var(--wash); color: var(--series); border-radius: 8px; padding: 12px; }
+.replica-grid h3 { margin: 0; }
+.statistics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0 0; }
+.statistics dt { font-size: .78rem; }
+.statistics dd { font-size: 1.22rem; font-weight: 720; margin: 3px 0 0; }
+.histogram { margin: 20px 0 0; }
+.histogram figcaption { color: var(--muted); font-size: .85rem; margin-bottom: 10px; }
+.bins { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+.bin { text-align: center; font-size: clamp(.54rem, 1.4vw, .76rem); color: var(--muted); }
+.bars { height: 88px; display: flex; align-items: end; justify-content: center; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.bars div { width: 30%; background: var(--series); }
+@media (max-width: 850px) { .statistics { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 650px) { .experiments .chart-heading { display: grid; } }
