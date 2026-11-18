@@ -10,7 +10,6 @@ type SceneProps = {
   individuals: Individual[];
   selected: number;
   onSelect: (index: number) => void;
-  population: number;
   generation: number;
   reducedMotion: boolean;
   onFailure: () => void;
@@ -141,16 +140,16 @@ function Cohort({ children, generation, reducedMotion }: {
   useLayoutEffect(() => {
     const previous = lastGeneration.current;
     lastGeneration.current = generation;
-    if (reducedMotion) {
+    if (reducedMotion || Math.abs(generation - previous) !== 1) {
       exchange.current = null;
       group.current?.position.set(0, 0, 0);
       group.current?.rotation.set(0, 0, 0);
       group.current?.scale.set(1, 1, 1);
-    } else if (previous !== generation) {
+    } else {
       const direction = Math.sign(generation - previous);
       exchange.current = { start: performance.now(), direction };
-      group.current?.position.set(direction * -0.34, 0.28, 0);
-      group.current?.scale.set(0.93, 0.8, 0.93);
+      group.current?.position.set(direction * -0.42, 0.22, 0);
+      group.current?.scale.set(0.95, 0.84, 0.95);
     }
     invalidate();
   }, [generation, reducedMotion, invalidate]);
@@ -162,8 +161,8 @@ function Cohort({ children, generation, reducedMotion }: {
     const time = Math.min(1, (performance.now() - active.start) / exchangeDuration);
     const remaining = (1 - time) ** 3;
     const sway = Math.sin(time * Math.PI * 2) * (1 - time);
-    cohort.position.set(active.direction * -0.34 * remaining, 0.28 * remaining, 0);
-    cohort.scale.set(1 - 0.07 * remaining, 1 - 0.2 * remaining + sway * 0.065, 1 - 0.07 * remaining);
+    cohort.position.set(active.direction * -0.42 * remaining, 0.22 * remaining, 0);
+    cohort.scale.set(1 - 0.05 * remaining, 1 - 0.16 * remaining + sway * 0.065, 1 - 0.05 * remaining);
     cohort.rotation.z = sway * active.direction * 0.025;
     if (time < 1) invalidate();
     else exchange.current = null;

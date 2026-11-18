@@ -4,7 +4,9 @@
 
 Compara dos poblaciones ficticias en un laboratorio 3D. Cada monito es un individuo diploide con dos antenas, una por copia del gen. Selecciona un monito para leer su par de alelos. Usa **Vista 2D** para ver los mismos individuos sin WebGL.
 
-![Laboratorio 3D con línea de tiempo y fijación de A en la generación 11, semilla 42](docs/simulador.png)
+![Exhibición en escritorio con el alelo A fijado en la generación 11](docs/simulador.png)
+
+[Ver la exhibición en móvil](docs/simulador-movil.png)
 
 ## Ejecutar en local
 
@@ -22,7 +24,7 @@ Vite genera un sitio estático en `dist/` con rutas relativas. GitHub Actions ej
 
 ## Experimento reproducible
 
-1. Selecciona **Cargar ejemplo**. Las poblaciones A y B tienen 20 y 200 individuos, respectivamente. Ambas parten al 50 %. El horizonte es de 120 generaciones y la semilla es 42.
+1. Abre **Parámetros del experimento** y selecciona **Cargar ejemplo**. Las poblaciones A y B tienen 20 y 200 individuos, respectivamente. Ambas parten al 50 %. El horizonte es de 120 generaciones y la semilla es 42.
 2. Escribe la hipótesis «La población de 20 individuos mostrará mayor dispersión al final del experimento».
 3. Lleva la línea de tiempo a la generación 10 y avanza un paso. En la generación 11, la población A muestra 40 copias del alelo A y 0 del alelo B. Retrocede y vuelve a la generación 11 para comprobar el mismo resultado en los monitos y el gráfico. En la generación 120, la población B termina con el alelo A al 10,5 %.
 4. Ejecuta las 100 réplicas y compara la desviación estándar. Repite el experimento con la misma semilla para recuperar los mismos resultados. Prueba la semilla 43 para observar una nueva muestra.

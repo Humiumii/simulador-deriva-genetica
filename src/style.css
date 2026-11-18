@@ -25,6 +25,11 @@ a { color: inherit; text-underline-offset: .22em; }
 .exhibit-nav { display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: .88rem; font-weight: 650; }
 .exhibit-nav a { padding: 5px 0; }
 .parameters { margin-block: 4px 8px; }
+.exhibit-options { position: relative; }
+.exhibit-options .mode-toggle,.exhibit-options .mode-notice { position: absolute; inset: 3px 0 auto auto; }
+.exhibit-options .mode-toggle { min-height: 34px; }
+.exhibit-options .mode-notice { padding-top: 7px; }
+.parameters[open] .setup { margin-top: 10px; }
 .parameters summary { width: fit-content; cursor: pointer; font-weight: 650; font-size: .88rem; padding: 10px 0; }
 .setup { border: 1px solid var(--line); padding: clamp(13px, 2vw, 23px); margin: 5px 0 15px; }
 .setup-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
@@ -95,4 +100,5 @@ button:disabled { opacity: .55; cursor: default; }
   form { grid-template-columns: minmax(0,1fr); }
   .hypothesis { grid-column: auto; }
   .trajectory text { font-size: 20px; }
+  .exhibit-options .mode-notice { width: 92px; text-align: end; font-size: .7rem; padding-top: 0; }
 }
