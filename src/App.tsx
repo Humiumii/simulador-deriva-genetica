@@ -3,6 +3,7 @@ import { compare, example, limits, initialCopies, type Parameters } from './moto
 import { formatFrequency, populationName, Trajectory } from './Trajectory';
 
 import { Experiments } from './Experiments';
+import { AlleleLegend, PopulationLab } from './PopulationLab';
 
 export function App() {
   const [parameters, setParameters] = useState(example);
@@ -10,6 +11,7 @@ export function App() {
   const [hypothesis, setHypothesis] = useState('');
   const [generation, setGeneration] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [flat, setFlat] = useState(false);
   const paths = useMemo(() => compare(parameters), [parameters]);
   const finished = generation === parameters.generations;
 
@@ -52,6 +54,22 @@ export function App() {
           <textarea id="hypothesis" rows={2} value={hypothesis} onChange={event => setHypothesis(event.target.value)}
             placeholder="¿En cuál población esperas más dispersión?" />
         </label>
+      </section>
+      <section className="lab" aria-labelledby="lab-heading">
+        <div className="lab-header">
+          <div><h2 id="lab-heading">Cámaras de población</h2><p>Selecciona un monito para mirar sus antenas.</p></div>
+          <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
+        </div>
+        <div className="chambers">
+          {paths.map((path, population) => <PopulationLab key={population} population={population}
+            size={parameters.sizes[population]} generation={generation} frequency={path[generation]} seed={parameters.seed} flat={flat} />)}
+        </div>
+        <AlleleLegend />
+          <div className="transport">
+            <button className="primary" disabled={finished} onClick={() => setPlaying(!playing)}>{playing ? 'Pausar' : 'Reproducir'}</button>
+            <button disabled={finished || playing} onClick={() => setGeneration(generation + 1)}>Avanzar 1 generación</button>
+            <button onClick={reset}>Reiniciar</button>
+          </div>
       </section>
       <div className="workspace">
         <aside className="panel setup">
@@ -97,11 +115,6 @@ export function App() {
             })}
           </div>
           <Trajectory paths={paths} generation={generation} total={parameters.generations} />
-          <div className="transport">
-            <button className="primary" disabled={finished} onClick={() => setPlaying(!playing)}>{playing ? 'Pausar' : 'Reproducir'}</button>
-            <button disabled={finished || playing} onClick={() => setGeneration(generation + 1)}>Avanzar 1 generación</button>
-            <button onClick={reset}>Reiniciar</button>
-          </div>
         </section>
       </div>
       <Experiments key={formVersion + JSON.stringify(parameters)} parameters={parameters} />
@@ -113,4 +126,3 @@ export function App() {
     </main>
   </>;
 }
-

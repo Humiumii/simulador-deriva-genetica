@@ -4,7 +4,7 @@
 
 Compara dos poblaciones ficticias y estudia cuánto cambia una frecuencia alélica por azar. Escribe una hipótesis, observa las trayectorias y contrasta la dispersión y los resultados extremos en 100 réplicas por población.
 
-![Comparación de 20 y 200 individuos y distribución final de las réplicas, semilla 42](docs/simulador.png)
+![Cámaras 3D de 20 y 200 individuos en la generación 11, semilla 42](docs/simulador.png)
 
 ## Ejecutar en local
 
