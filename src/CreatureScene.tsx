@@ -28,7 +28,7 @@ type Part = {
   color: string;
 };
 
-const bodies = ['#8caaf5', '#b79bf5', '#a7c3fa', '#a9a2ef'];
+const bodies = ['#a9afb7', '#b3acb5', '#aab8b4', '#c0b8ae'];
 
 function layout(count: number) {
   const columns = count <= 24 ? Math.ceil(Math.sqrt(count * 1.25)) : 8;
@@ -124,20 +124,10 @@ function Camera() {
   return null;
 }
 
-function Platform({ population }: { population: number }) {
-  const palette = population === 0 ? ['#294768', '#427598', '#569bb4'] : ['#3c386c', '#62538f', '#7d6bbb'];
+function Platform() {
   return <>
-    <mesh position={[0, -0.46, 0]}><boxGeometry args={[11.04, 0.58, 7.54]} /><meshStandardMaterial color={palette[0]} roughness={0.73} /></mesh>
-    <mesh position={[0, -0.13, 0]}><boxGeometry args={[10.82, 0.27, 7.3]} /><meshStandardMaterial color={palette[1]} roughness={0.88} /></mesh>
-    {[-4, -2, 0, 2, 4].map(x => <mesh key={x} position={[x, 0.01, 0]}>
-      <boxGeometry args={[0.015, 0.009, 7.22]} /><meshBasicMaterial color={palette[2]} />
-    </mesh>)}
-    {[-3, -2, -1, 0, 1, 2, 3].map(z => <mesh key={z} position={[0, 0.01, z]}>
-      <boxGeometry args={[10.76, 0.009, 0.015]} /><meshBasicMaterial color={palette[2]} />
-    </mesh>)}
-    {[-4.9, 4.9].map(x => <mesh key={x} position={[x, -0.26, 3.8]}>
-      <boxGeometry args={[0.51, 0.067, 0.028]} /><meshBasicMaterial color="#8df4df" />
-    </mesh>)}
+    <mesh position={[0, -0.43, 0]}><boxGeometry args={[11.04, 0.52, 7.54]} /><meshStandardMaterial color="#333733" roughness={0.84} /></mesh>
+    <mesh position={[0, -0.13, 0]}><boxGeometry args={[10.92, 0.27, 7.42]} /><meshStandardMaterial color="#50574f" roughness={0.88} /></mesh>
   </>;
 }
 
@@ -181,21 +171,21 @@ function Cohort({ children, generation, reducedMotion }: {
   return <group ref={group}>{children}</group>;
 }
 
-function CreatureStage({ individuals, selected, onSelect, population, generation, reducedMotion }: Omit<SceneProps, 'onFailure'>) {
+function CreatureStage({ individuals, selected, onSelect, generation, reducedMotion }: Omit<SceneProps, 'onFailure'>) {
   const positions = useMemo(() => layout(individuals.length), [individuals.length]);
   const parts = useMemo(() => creatureParts(individuals), [individuals]);
   const current = positions[selected];
   const shadows = positions.map((position, individual): Part => ({
     individual, x: 0, y: 0.022 / position.scale, z: 0, sx: 0.72, sy: 0.014, sz: 0.63, angle: 0,
-    color: population === 0 ? '#345578' : '#4c427c',
+    color: '#424740',
   }));
 
   return <>
     <Camera />
     <ambientLight intensity={1.65} />
     <directionalLight position={[-4, 7, 3]} intensity={2.4} color="#e1ecff" />
-    <directionalLight position={[5, 2, -4]} intensity={1.05} color="#b395fc" />
-    <Platform population={population} />
+    <directionalLight position={[5, 2, -4]} intensity={1.05} color="#e1ded1" />
+    <Platform />
     <Instances parts={shadows} positions={positions} shape="sphere" />
     <Cohort generation={generation} reducedMotion={reducedMotion}>
       {current && <mesh position={[current.x, 0.035, current.z]} rotation={[-Math.PI / 2, 0, 0]}>

@@ -47,7 +47,7 @@ export function Experiments({ parameters }: { parameters: Parameters }) {
 
   const stats = values?.map(summarize);
   const maximum = stats ? Math.max(1, ...stats.flatMap(item => item.bins)) : 1;
-  return <section className="panel experiments" aria-labelledby="experiments-heading">
+  return <section id="replicas" className="panel experiments" aria-labelledby="experiments-heading">
     <div className="chart-heading">
       <div><h2 id="experiments-heading">Experimentos repetidos</h2>
         <p>Compara la frecuencia final en {replicaCount} réplicas por población.</p></div>
