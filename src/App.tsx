@@ -4,6 +4,8 @@ import { formatFrequency, populationName, Trajectory } from './Trajectory';
 
 import { Experiments } from './Experiments';
 import { AlleleLegend, PopulationLab } from './PopulationLab';
+import { TimeControls } from './TimeControls';
+import { generationInterval, supportsWebGL, useReducedMotion } from './labMotion';
 
 export function App() {
   const [parameters, setParameters] = useState(example);
@@ -12,6 +14,8 @@ export function App() {
   const [generation, setGeneration] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [flat, setFlat] = useState(false);
+  const [webgl] = useState(supportsWebGL);
+  const reducedMotion = useReducedMotion();
   const paths = useMemo(() => compare(parameters), [parameters]);
   const finished = generation === parameters.generations;
 
@@ -20,13 +24,17 @@ export function App() {
     const timer = window.setTimeout(() => {
       setGeneration(generation + 1);
       if (generation + 1 === parameters.generations) setPlaying(false);
-    }, 90);
+    }, generationInterval);
     return () => window.clearTimeout(timer);
   }, [finished, generation, parameters, playing]);
 
-  function reset() {
+  function seek(next: number) {
     setPlaying(false);
-    setGeneration(0);
+    setGeneration(next);
+  }
+
+  function reset() {
+    seek(0);
   }
 
   function configure(event: FormEvent<HTMLFormElement>) {
@@ -58,18 +66,18 @@ export function App() {
       <section className="lab" aria-labelledby="lab-heading">
         <div className="lab-header">
           <div><h2 id="lab-heading">Cámaras de población</h2><p>Selecciona un monito para mirar sus antenas.</p></div>
-          <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
+          {webgl
+            ? <button className="mode-toggle" type="button" aria-pressed={flat} onClick={() => setFlat(!flat)}>Vista 2D</button>
+            : <span className="mode-notice">Vista 2D · WebGL no disponible</span>}
         </div>
+        <TimeControls generation={generation} total={parameters.generations} playing={playing}
+          toggle={() => setPlaying(!playing)} seek={seek} reset={reset} />
         <div className="chambers">
           {paths.map((path, population) => <PopulationLab key={population} population={population}
-            size={parameters.sizes[population]} generation={generation} frequency={path[generation]} seed={parameters.seed} flat={flat} />)}
+            size={parameters.sizes[population]} generation={generation} frequency={path[generation]} seed={parameters.seed} flat={flat || !webgl} reducedMotion={reducedMotion}
+            endpoint={path.findIndex(value => value === 0 || value === 1)} />)}
         </div>
         <AlleleLegend />
-          <div className="transport">
-            <button className="primary" disabled={finished} onClick={() => setPlaying(!playing)}>{playing ? 'Pausar' : 'Reproducir'}</button>
-            <button disabled={finished || playing} onClick={() => setGeneration(generation + 1)}>Avanzar 1 generación</button>
-            <button onClick={reset}>Reiniciar</button>
-          </div>
       </section>
       <div className="workspace">
         <aside className="panel setup">

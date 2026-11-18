@@ -1,7 +1,8 @@
-import { Canvas, useThree } from '@react-three/fiber';
-import { useLayoutEffect, useRef, type ReactNode } from 'react';
-import { Color, Object3D, type InstancedMesh, type OrthographicCamera } from 'three';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
+import { Color, Object3D, type Group, type InstancedMesh, type OrthographicCamera } from 'three';
 import type { Allele, Individual } from './individuals';
+import { exchangeDuration } from './labMotion';
 
 export const alleleColors: Record<Allele, string> = { A: '#49e9b9', B: '#ff8da8' };
 
@@ -10,6 +11,8 @@ type SceneProps = {
   selected: number;
   onSelect: (index: number) => void;
   population: number;
+  generation: number;
+  reducedMotion: boolean;
   onFailure: () => void;
 };
 
@@ -138,9 +141,49 @@ function Platform({ population }: { population: number }) {
   </>;
 }
 
-function CreatureStage({ individuals, selected, onSelect, population }: Omit<SceneProps, 'onFailure'>) {
-  const positions = layout(individuals.length);
-  const parts = creatureParts(individuals);
+function Cohort({ children, generation, reducedMotion }: {
+  children: ReactNode; generation: number; reducedMotion: boolean;
+}) {
+  const group = useRef<Group>(null);
+  const lastGeneration = useRef(generation);
+  const exchange = useRef<{ start: number; direction: number } | null>(null);
+  const invalidate = useThree(state => state.invalidate);
+  useLayoutEffect(() => {
+    const previous = lastGeneration.current;
+    lastGeneration.current = generation;
+    if (reducedMotion) {
+      exchange.current = null;
+      group.current?.position.set(0, 0, 0);
+      group.current?.rotation.set(0, 0, 0);
+      group.current?.scale.set(1, 1, 1);
+    } else if (previous !== generation) {
+      const direction = Math.sign(generation - previous);
+      exchange.current = { start: performance.now(), direction };
+      group.current?.position.set(direction * -0.34, 0.28, 0);
+      group.current?.scale.set(0.93, 0.8, 0.93);
+    }
+    invalidate();
+  }, [generation, reducedMotion, invalidate]);
+
+  useFrame(() => {
+    const active = exchange.current;
+    const cohort = group.current;
+    if (!active || !cohort) return;
+    const time = Math.min(1, (performance.now() - active.start) / exchangeDuration);
+    const remaining = (1 - time) ** 3;
+    const sway = Math.sin(time * Math.PI * 2) * (1 - time);
+    cohort.position.set(active.direction * -0.34 * remaining, 0.28 * remaining, 0);
+    cohort.scale.set(1 - 0.07 * remaining, 1 - 0.2 * remaining + sway * 0.065, 1 - 0.07 * remaining);
+    cohort.rotation.z = sway * active.direction * 0.025;
+    if (time < 1) invalidate();
+    else exchange.current = null;
+  });
+  return <group ref={group}>{children}</group>;
+}
+
+function CreatureStage({ individuals, selected, onSelect, population, generation, reducedMotion }: Omit<SceneProps, 'onFailure'>) {
+  const positions = useMemo(() => layout(individuals.length), [individuals.length]);
+  const parts = useMemo(() => creatureParts(individuals), [individuals]);
   const current = positions[selected];
   const shadows = positions.map((position, individual): Part => ({
     individual, x: 0, y: 0.022 / position.scale, z: 0, sx: 0.72, sy: 0.014, sz: 0.63, angle: 0,
@@ -154,15 +197,17 @@ function CreatureStage({ individuals, selected, onSelect, population }: Omit<Sce
     <directionalLight position={[5, 2, -4]} intensity={1.05} color="#b395fc" />
     <Platform population={population} />
     <Instances parts={shadows} positions={positions} shape="sphere" />
-    {current && <mesh position={[current.x, 0.035, current.z]} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[current.scale * 0.72, current.scale * 0.83, 28]} />
-      <meshBasicMaterial color="#f7fcff" />
-    </mesh>}
-    <Instances parts={parts.body} positions={positions} shape="sphere" onSelect={onSelect} />
-    <Instances parts={parts.details} positions={positions} shape="sphere" />
-    <Instances parts={parts.stems} positions={positions} shape="stem" />
-    <Instances parts={parts.circle} positions={positions} shape="sphere" />
-    <Instances parts={parts.diamond} positions={positions} shape="diamond" />
+    <Cohort generation={generation} reducedMotion={reducedMotion}>
+      {current && <mesh position={[current.x, 0.035, current.z]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[current.scale * 0.72, current.scale * 0.83, 28]} />
+        <meshBasicMaterial color="#f7fcff" />
+      </mesh>}
+      <Instances parts={parts.body} positions={positions} shape="sphere" onSelect={onSelect} />
+      <Instances parts={parts.details} positions={positions} shape="sphere" />
+      <Instances parts={parts.stems} positions={positions} shape="stem" />
+      <Instances parts={parts.circle} positions={positions} shape="sphere" />
+      <Instances parts={parts.diamond} positions={positions} shape="diamond" />
+    </Cohort>
   </>;
 }
 

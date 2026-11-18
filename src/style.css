@@ -59,7 +59,6 @@ button:disabled { opacity: .5; cursor: default; }
 .series-b .path { stroke-dasharray: 5 3; }
 .marker { fill: var(--series); }
 .endpoint { fill: white; stroke: var(--series); stroke-width: 2; }
-.transport { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .model { max-width: 820px; margin-block: 28px 40px; }
 .model p { margin-top: 8px; }
 @media (max-width: 850px) {
